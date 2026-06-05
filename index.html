@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signals — Research-backed opportunity discovery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F9FC;
+            --primary-blue: #0D0FA5;
+            --accent-orange: rgb(253, 171, 35);
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --card-bg: #FFFFFF;
+            --focus-blue: rgba(13, 15, 165, 0.15);
+            --font-family: 'Wix Madefor Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Premium Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 99px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+
+        header {
+            padding: 24px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(248, 249, 252, 0.8);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-logo svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--primary-blue);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .api-config {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .api-input {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-family);
+            font-size: 12px;
+            width: 180px;
+            outline: none;
+            transition: all 0.2s var(--transition-smooth);
+        }
+
+        .api-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px var(--focus-blue);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s var(--transition-smooth), transform 0.4s var(--transition-smooth);
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            margin-bottom: 48px;
+            animation: fadeIn 0.6s var(--transition-smooth);
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .hero .attribution {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 540px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* MODE SELECTION */
+        .mode-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+        }
+
+        .mode-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-2px);
+            border-color: #CBD5E1;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        .mode-card.selected {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 1px var(--primary-blue), 0 12px 30px -10px rgba(13, 15, 165, 0.08);
+        }
+
+        .mode-card.selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-blue);
+        }
+
+        .mode-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .mode-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* FORM FIELD SYSTEM */
+        .form-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+            animation: slideUp 0.4s var(--transition-smooth);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .form-group {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: #FAFAFA;
+            font-family: var(--font-family);
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.25s var(--transition-smooth);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            background-color: var(--card-bg);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px var(--focus-blue);
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* TEAM BUILDER ENGINE */
+        .team-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+            margin-top: 24px;
+        }
+
+        .team-title-row {
+            display: flex;
+            justify-content: justify;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .team-member-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            animation: fadeIn 0.3s var(--transition-smooth);
+        }
+
+        .btn {
+            font-family: var(--font-family);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s var(--transition-smooth);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+            width: 100%;
+            padding: 16px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #060875;
+            box-shadow: 0 4px 12px rgba(13, 15, 165, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #F1F5F9;
+            border-color: #CBD5E1;
+        }
+
+        .btn-danger {
+            background-color: #FEF2F2;
+            color: #EF4444;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #FEE2E2;
+        }
+
+        .btn-danger:hover {
+            background-color: #FEE2E2;
+        }
+
+        /* STAGED LOADING SCREEN */
+        .loading-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .loading-screen.active {
+            display: flex;
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            margin-bottom: 32px;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(13, 15, 165, 0.08);
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-pulse {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 40px;
+            height: 40px;
+            background-color: var(--focus-blue);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .loading-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            height: 20px;
+        }
+
+        .loading-steps {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .step-item.active {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .step-item.completed {
+            color: #10B981;
+        }
+
+        .step-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #D1D5DB;
+        }
+
+        .step-item.active .step-dot {
+            background-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px var(--focus-blue);
+        }
+
+        .step-item.completed .step-dot {
+            background-color: #10B981;
+        }
+
+        /* OPPORTUNITY EXPLORER (SCREEN 2) */
+        .explorer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .explorer-meta h2 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .explorer-meta p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .opportunity-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 28px;
+            cursor: pointer;
+            transition: transform 0.4s var(--transition-smooth), border-color 0.4s var(--transition-smooth), box-shadow 0.4s var(--transition-smooth), opacity 0.3s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .opportunity-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: #CBD5E1;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.03), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-blue {
+            background-color: #EEF2FF;
+            color: var(--primary-blue);
+        }
+
+        .badge-orange {
+            background-color: #FFF7ED;
+            color: #EA580C;
+        }
+
+        .badge-gray {
+            background-color: #F3F4F6;
+            color: #4B5563;
+        }
+
+        .card-problem-statement {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex-grow: 0;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #F3F4F6;
+            padding-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: #4B5563;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding-top: 12px;
+            border-top: 1px solid #F3F4F6;
+        }
+
+        .explorer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+        }
+
+        /* PROJECT DETAIL VIEW (SCREEN 3) */
+        .detail-layout {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .detail-header {
+            margin-bottom: 40px;
+        }
+
+        .back-nav {
+            margin-bottom: 24px;
+        }
+
+        .detail-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .detail-problem {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            line-height: 1.25;
+            margin-bottom: 16px;
+        }
+
+        .detail-pitch {
+            font-size: 18px;
+            color: #4B5563;
+            line-height: 1.5;
+            font-weight: 400;
+            padding-left: 16px;
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .detail-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary-blue);
+            margin-bottom: 12px;
+        }
+
+        .detail-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 12px;
+        }
+
+        .detail-section p {
+            font-size: 15px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        /* SPECIALIZED STUDENT TRAJECTORY TIMELINE */
+        .trajectory-section {
+            border-left: 4px solid var(--primary-blue);
+            background: linear-gradient(90deg, rgba(13, 15, 165, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 0 12px 12px 0;
+        }
+
+        .trajectory-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .timeline-node {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline-node::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+        }
+
+        .node-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .node-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* DATASET CARD ARCHITECTURE */
+        .dataset-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .dataset-card {
+            border: 1px solid var(--border-color);
+            background: #FAFAFA;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .dataset-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .dataset-relevance {
+            font-size: 13px;
+            color: #4B5563;
+            line-height: 1.4;
+        }
+
+        /* NATIVE VIDEO LAYOUT */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            border-radius: 8px;
+            background: #000;
+            margin-top: 16px;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* SIMILAR PROJECTS SCHEMA */
+        .similar-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .similar-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            background: #FAFAFA;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .similar-project-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .similar-author {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .similar-desc {
+            font-size: 13px;
+            color: #4B5563;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .similar-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-sm-primary {
+            background: #111827;
+            color: white;
+        }
+
+        .btn-sm-primary:hover {
+            background: #1F2937;
+        }
+
+        /* ANOMALY / EMPTY STATE MANAGERS */
+        .error-toast {
+            background-color: #FEF2F2;
+            border: 1px solid #FEE2E2;
+            color: #EF4444;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* ANIMATION ASSETS */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 0; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 960px) {
+            .cards-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .mode-container, .form-grid, .cards-grid, .similar-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+            header {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            .api-config {
+                width: 100%;
+            }
+            .api-input {
+                width: 100%;
+            }
+            .hero h1 {
+                font-size: 32px;
+            }
+            .form-container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8-8-3.582-8-8zm8-6c-3.314 0-6 2.686-6 6s2.686 6 6 6 6-2.686 6-6-2.686-6-6-6z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <span class="brand-title">Signals</span>
+                <span class="brand-subtitle">by BetterMind Labs</span>
+            </div>
+        </div>
+        <div class="api-config">
+            <input type="text" id="backendUrl" class="api-input" value="http://127.0.0.1:8000" placeholder="Backend Environment URL">
+        </div>
+    </header>
+
+    <main>
+        <div id="errorToast" class="error-toast"></div>
+
+        <div id="screenDiscovery" class="screen active">
+            <div class="hero">
+                <div class="attribution">Signals</div>
+                <h1>Research-backed opportunity discovery</h1>
+                <p>Discover deeply non-trivial, domain-specific problems worth addressing using an evidence-first matching loop.</p>
+            </div>
+
+            <div class="mode-container">
+                <div class="mode-card selected" id="modeBmlCard" onclick="switchMode('bml')">
+                    <div class="mode-title">BetterMind Labs Student</div>
+                    <div class="mode-desc">Sync platform settings using your active student registration database profile context layers.</div>
+                </div>
+                <div class="mode-card" id="modeExternalCard" onclick="switchMode('external')">
+                    <div class="mode-title">External Portfolio Track</div>
+                    <div class="mode-desc">Initialize localized parameters manually to extract research tracks tailored to your lineage.</div>
+                </div>
+            </div>
+
+            <div id="formBml" class="form-container active">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Primary Student Email Address</label>
+                        <input type="email" id="bmlPrimaryEmail" class="form-input" placeholder="student@example.com" value="aarav@example.com">
+                    </div>
+                    
+                    <div class="form-group full-width team-section">
+                        <div class="team-title-row">
+                            <label class="form-label" style="margin-bottom:0;">Collaborative Cohort Members (Optional)</label>
+                            <button type="button" class="btn btn-secondary" onclick="addTeamMemberField()" style="padding: 4px 10px; font-size: 12px;">+ Add Teammate</button>
+                        </div>
+                        <div id="teamContainer"></div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">A maximum of 3 participants can build an operational group sequence.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="submitDiscovery('bml')">Generate Opportunities</button>
+            </div>
+
+            <div id="formExternal" class="form-container">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="extName" class="form-input" placeholder="Alexei Manuel">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="extEmail" class="form-input" placeholder="alexei@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Grade Level</label>
+                        <select id="extGrade" class="form-select">
+                            <option value="11">Grade 11</option>
+                            <option value="12">Grade 12</option>
+                            <option value="10">Grade 10</option>
+                            <option value="9">Grade 9</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" id="extCity" class="form-input" placeholder="San Jose">
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Project Themes of Interest (Comma Separated)</label>
+                        <input type="text" id="extInterests" class="form-input" placeholder="AI + Finance, AI + Quants, AI + Healthcare">
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Toughest Technical Engineering Milestone Completed So Far</label>
+                        <textarea id="extToughest" class="form-textarea" placeholder="Describe the most complex project architecture, model loop, or system deployment you have built. Be specific."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Initial Seed Concept / Core Focus Space (Optional)</label>
+                        <input type="text" id="extIdea" class="form-input" placeholder="Liquidity risk models or algorithmic alternative tracking indicators">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="submitDiscovery('external')">Generate Opportunities</button>
+            </div>
+        </div>
+
+        <div id="screenLoading" class="loading-screen">
+            <div class="spinner-container">
+                <div class="spinner-ring"></div>
+                <div class="spinner-pulse"></div>
+            </div>
+            <div class="loading-title">Activating Discovery Pipeline</div>
+            <div class="loading-subtitle" id="loadingStatusText">Analyzing historical student lineage...</div>
+            
+            <div class="loading-steps">
+                <div class="step-item" id="step1"><div class="step-dot"></div>Analyzing trajectory matrices</div>
+                <div class="step-item" id="step2"><div class="step-dot"></div>Mapping vector-space indices</div>
+                <div class="step-item" id="step3"><div class="step-dot"></div>Isolating domain opportunity clusters</div>
+                <div class="step-item" id="step4"><div class="step-dot"></div>Synthesizing research archetypes</div>
+            </div>
+        </div>
+
+        <div id="screenExplorer" class="screen">
+            <div class="explorer-header">
+                <div class="explorer-meta">
+                    <h2>Opportunity Map</h2>
+                    <p id="explorerSessionMeta">Session: None — Framework Confirmed</p>
+                </div>
+                <div class="badge badge-blue" style="padding: 6px 12px;" id="archetypeBadge">ENGINEER CORE</div>
+            </div>
+
+            <div class="cards-grid" id="opportunityCardsContainer"></div>
+
+            <div class="explorer-actions">
+                <button class="btn btn-secondary" onclick="navigationBackToDiscovery()">← System Configuration</button>
+                <button class="btn btn-secondary" id="btnNicheGlobal" style="display:none;" onclick="triggerGlobalNicheDown()">Narrow Selected Domain Track</button>
+            </div>
+        </div>
+
+        <div id="screenDetail" class="screen">
+            <div class="detail-layout" id="detailViewContent"></div>
+        </div>
+    </main>
+
+    <script>
+        // CLIENT STATE ENGINE
+        let appState = {
+            activeMode: 'bml',
+            currentSessionId: null,
+            ideas: [],
+            selectedIdeaId: null,
+            meta: null
+        };
+
+        const statusMessages = [
+            "Analyzing student trajectory anchors...",
+            "Mapping structural alignment benchmarks...",
+            "Calculating archetype variance models...",
+            "Running hybrid strategic retrieval layers...",
+            "Finalizing counselor narrative tracks..."
+        ];
+
+        function switchMode(mode) {
+            appState.activeMode = mode;
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+            
+            if (mode === 'bml') {
+                document.getElementById('modeBmlCard').classList.add('selected');
+                document.getElementById('formBml').classList.add('active');
+            } else {
+                document.getElementById('modeExternalCard').classList.add('selected');
+                document.getElementById('formExternal').classList.add('active');
+            }
+        }
+
+        function addTeamMemberField() {
+            const container = document.getElementById('teamContainer');
+            const currentCount = container.children.length;
+            if (currentCount >= 2) {
+                showError("Operational frameworks limit execution pipelines to a maximum of 3 participants.");
+                return;
+            }
+
+            const row = document.createElement('div');
+            row.className = 'team-member-row';
+            row.innerHTML = `
+                <input type="email" class="form-input team-member-email" placeholder="teammate@example.com" style="flex:1;">
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()" style="padding:12px;">Remove</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function toggleScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active');
+            });
+            const target = document.getElementById(screenId);
+            target.classList.add('active');
+        }
+
+        function showError(message) {
+            const toast = document.getElementById('errorToast');
+            toast.innerText = message;
+            toast.style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 6000);
+        }
+
+        function runStagedLoading(callback) {
+            toggleScreen('screenLoading');
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            let currentStep = 0;
+
+            steps.forEach(id => document.getElementById(id).className = 'step-item');
+            
+            const interval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    document.getElementById(steps[currentStep]).classList.add('active');
+                    if (currentStep > 0) {
+                        document.getElementById(steps[currentStep - 1]).classList.remove('active');
+                        document.getElementById(steps[currentStep - 1]).classList.add('completed');
+                    }
+                    document.getElementById('loadingStatusText').innerText = statusMessages[currentStep] || "Processing system nodes...";
+                    currentStep++;
+                } else {
+                    clearInterval(interval);
+                    document.getElementById(steps[steps.length - 1]).classList.add('completed');
+                    callback();
+                }
+            }, 800);
+        }
+
+        async function submitDiscovery(mode) {
+            const backendBase = document.getElementById('backendUrl').value.trim();
+            let url = '';
+            let payload = {};
+
+            if (mode === 'bml') {
+                const primary = document.getElementById('bmlPrimaryEmail').value.trim();
+                if (!primary) {
+                    showError("Primary verification parameter required.");
+                    return;
+                }
+                
+                const memberInputs = document.querySelectorAll('.team-member-email');
+                const participants = [];
+                memberInputs.forEach(i => {
+                    if (i.value.trim()) {
+                        participants.push({ email: i.value.trim() });
+                    }
+                });
+
+                url = `${backendBase}/generate-bml`;
+                payload = {
+                    mode: "bettermind",
+                    primary_student: { email: primary },
+                    participants: participants
+                };
+            } else {
+                const email = document.getElementById('extEmail').value.trim();
+                const name = document.getElementById('extName').value.trim();
+                const grade = parseInt(document.getElementById('extGrade').value);
+                const city = document.getElementById('extCity').value.trim();
+                const interests = document.getElementById('extInterests').value.trim();
+                const toughest = document.getElementById('extToughest').value.trim();
+                const idea = document.getElementById('extIdea').value.trim();
+
+                if (!email || !toughest) {
+                    showError("Historical engineering parameters and identity profiles must be verified.");
+                    return;
+                }
+
+                url = `${backendBase}/generate`;
+                payload = {
+                    email: email,
+                    interest_areas: interests,
+                    grade: grade,
+                    city: city,
+                    toughest_project: toughest,
+                    proposed_idea: idea || null
+                };
+            }
+
+            runStagedLoading(async () => {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        throw new Error(`Pipeline disruption: ${errText || response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    appState.currentSessionId = data.session_id;
+                    appState.ideas = data.ideas;
+                    appState.meta = data.discovery_metadata;
+
+                    renderExplorerView();
+                    toggleScreen('screenExplorer');
+                } catch (err) {
+                    toggleScreen('screenDiscovery');
+                    showError(err.message);
+                }
+            });
+        }
+
+        function renderExplorerView() {
+            document.getElementById('explorerSessionMeta').innerText = `Engine Track: ${appState.meta.generation_framework || 'Custom Variant'}`;
+            
+            // Handle optional archetype data mapping
+            const archetypeContainer = document.getElementById('archetypeBadge');
+            archetypeContainer.innerText = appState.ideas[0]?.why_this_fits_you[0]?.toUpperCase().includes('ARCHETYPE') 
+                ? appState.ideas[0].why_this_fits_you[0].replace('Aligned with your ', '').replace(' archetype framework choice.', '').toUpperCase()
+                : "CORE SCHOLAR ARCHETYPE";
+
+            const cardContainer = document.getElementById('opportunityCardsContainer');
+            cardContainer.innerHTML = '';
+
+            appState.ideas.forEach((idea, index) => {
+                const bucketLabels = ["Direct Trajectory Line", "Interdisciplinary Synthesis", "High Novelty Spectrum"];
+                const bucket = bucketLabels[index] || "Research Matrix Opportunity";
+
+                const card = document.createElement('div');
+                card.className = 'opportunity-card';
+                card.onclick = () => renderDetailedReport(idea.id);
+
+                card.innerHTML = `
+                    <div class="badge-row">
+                        <span class="badge badge-blue">${bucket}</span>
+                        <span class="badge badge-gray">${idea.difficulty || 'Advanced'}</span>
+                    </div>
+                    <div class="card-problem-statement">“${idea.problem_area}”</div>
+                    <div class="card-title">${idea.title}</div>
+                    <div class="card-desc">${idea.project_description}</div>
+                    <div class="card-footer">
+                        <span>Feasibility Index: ${idea.feasibility_score || 9}/10</span>
+                        <span style="color:var(--primary-blue); font-weight:700;">Open Analysis →</span>
+                    </div>
+                `;
+                cardContainer.appendChild(card);
+            });
+        }
+
+        function parseYoutubeId(url) {
+            if (!url) return null;
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function renderDetailedReport(ideaId) {
+            appState.selectedIdeaId = ideaId;
+            const idea = appState.ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+
+            const container = document.getElementById('detailViewContent');
+            
+            // Build dynamic data source list structures
+            let datasetHtml = '';
+            if (idea.datasets) {
+                const datasetsArray = idea.datasets.split(';');
+                datasetsArray.forEach(ds => {
+                    const parts = ds.split(':');
+                    const name = parts[0] || 'High-Fidelity Verified Repository';
+                    const detail = parts[1] || 'Provides structural validation anchors for pipeline calibration loops.';
+                    datasetHtml += `
+                        <div class="dataset-card">
+                            <div class="dataset-name">${name.trim()}</div>
+                            <div class="dataset-relevance">${detail.trim()}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Map corresponding verified items tracking GitHub frameworks
+            let similarProjectsHtml = '';
+            if (idea.similar_projects && idea.similar_projects.length > 0) {
+                idea.similar_projects.forEach(p => {
+                    const ytId = parseYoutubeId(p.youtube_url);
+                    let videoEmbed = '';
+                    if (ytId) {
+                        videoEmbed = `
+                            <div class="video-wrapper">
+                                <iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen></iframe>
+                            </div>
+                        `;
+                    }
+
+                    similarProjectsHtml += `
+                        <div class="similar-card">
+                            <div class="similar-project-title">${p.title}</div>
+                            <div class="similar-author">Built by: ${p.student_name} — Track: ${p.project_category}</div>
+                            <div class="similar-desc">${p.description}</div>
+                            <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px; font-style:italic;"><strong>Matching Context:</strong> ${p.matching_reason}</p>
+                            ${videoEmbed}
+                            <div class="similar-actions" style="margin-top:16px;">
+                                <a href="${p.github_url}" target="_blank" class="btn btn-sm btn-sm-primary">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                    Source Verification
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                similarProjectsHtml = `<p style="font-size:14px; color:var(--text-muted); font-style:italic;">No structural equivalent project parameters are indexed inside the reference matrix space.</p>`;
+            }
+
+            container.innerHTML = `
+                <div class="back-nav">
+                    <button class="btn btn-secondary" onclick="toggleScreen('screenExplorer')">← Opportunity Landscape</button>
+                </div>
+
+                <div class="detail-header">
+                    <div class="detail-title">${idea.title}</div>
+                    <div class="detail-problem">“${idea.problem_area}”</div>
+                    <div class="detail-pitch">${idea.guiding_question}</div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-label">Problem Architecture Context</div>
+                    <p>${idea.problem_context || idea.project_description}</p>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-label">Target Stakeholders</div>
+                    <p><strong>Impacted User Profiles:</strong> ${idea.who_experiences_this_problem || idea.target_users}</p>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-label">Systemic Blockades</div>
+                    <h3>Why this structural mismatch persists</h3>
+                    <p>${idea.why_this_problem_exists || idea.why_it_matters}</p>
+                </div>
+
+                <div class="detail-section trajectory-section">
+                    <div class="section-label" style="color:var(--primary-blue);">Trajectory Continuity Mapping</div>
+                    <h3>Student History Blueprint Integration</h3>
+                    <p style="margin-bottom:16px; font-weight:500; color:var(--text-main);">${idea.student_history_connection}</p>
+                    <div class="trajectory-timeline">
+                        <div class="timeline-node">
+                            <div class="node-title">Demonstrated Technical Origin</div>
+                            <div class="node-desc">Leverages proven engineering paradigms verified inside your primary deployment profiles.</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="node-title">Target Progression Window</div>
+                            <div class="node-desc">Advances implementation complexity boundaries via specialized optimization pipelines.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-label">Technical Ingestion Pipeline</div>
+                    <h3>Core Development Engineering Framework</h3>
+                    <p style="margin-bottom:12px;"><strong>Execution Environment:</strong> <code>${idea.tools || 'Python, Pandas, Scikit-Learn'}</code></p>
+                    <p>${idea.technical_approach}</p>
+                    
+                    <div style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+                        <div style="background:#FAFAFA; padding:12px; border-radius:6px; font-size:13px;">
+                            <strong>Milestone Week 1:</strong><br>${idea.week1_plan}
+                        </div>
+                        <div style="background:#FAFAFA; padding:12px; border-radius:6px; font-size:13px;">
+                            <strong>Milestone Week 2:</strong><br>${idea.week2_plan}
+                        </div>
+                        <div style="background:#FAFAFA; padding:12px; border-radius:6px; font-size:13px;">
+                            <strong>Milestone Week 3:</strong><br>${idea.week3_plan}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-label">Public Data Registries & High Fidelity Sources</div>
+                    <div class="dataset-grid">${datasetHtml}</div>
+                </div>
+
+                <div class="detail-section" style="background: #FAF9F6; border-color: #EAE6DF;">
+                    <div class="section-label" style="color:#B45309;">Admissions Context Evaluation</div>
+                    <h3>Intellectual Position & Narrative Footprint</h3>
+                    <p style="font-style:normal; color:#451A03; font-size:14.5px; line-height:1.65;">${idea.college_narrative || idea.college_application_value}</p>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-label">Benchmarked Reference Projects</div>
+                    <div class="similar-grid">${similarProjectsHtml}</div>
+                </div>
+
+                <div style="margin-top:32px; padding-bottom:60px; display:flex; justify-content:space-between;">
+                    <button class="btn btn-secondary" onclick="toggleScreen('screenExplorer')">← Landscape View</button>
+                    <button class="btn btn-primary" style="width:auto; padding:12px 32px;" onclick="triggerNicheDown('${idea.id}')">Refine / Niche Down This Track</button>
+                </div>
+            `;
+
+            toggleScreen('screenDetail');
+        }
+
+        async function triggerNicheDown(ideaId) {
+            const backendBase = document.getElementById('backendUrl').value.trim();
+            const url = `${backendBase}/niche-down`;
+            const payload = {
+                session_id: appState.currentSessionId,
+                idea_id: ideaId
+            };
+
+            runStagedLoading(async () => {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error("Hierarchical refinement pipeline execution error.");
+
+                    const data = await response.json();
+                    appState.ideas = data.ideas;
+                    appState.meta = data.discovery_metadata;
+
+                    renderExplorerView();
+                    toggleScreen('screenExplorer');
+                } catch (err) {
+                    toggleScreen('screenExplorer');
+                    showError(err.message);
+                }
+            });
+        }
+
+        function navigationBackToDiscovery() {
+            toggleScreen('screenDiscovery');
+        }
+    </script>
+</body>
+</html>
