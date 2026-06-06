@@ -220,7 +220,25 @@ def extract_student_history_assets(profile: Dict[str, Any]) -> List[str]:
         "founder": "startup building structures",
         "startup": "startup building structures",
         "fundraise": "community fundraising logistics",
-        "forecast": "predictive forecasting configurations"
+        "forecast": "predictive forecasting configurations",
+        "legal": "legal document analysis",
+        "law": "legal reasoning systems",
+        "contract": "contract intelligence",
+        "contracts": "contract intelligence",
+        "court": "judicial analytics",
+        "judge": "judicial analytics",
+        "judicial": "judicial outcome prediction",
+        "litigation": "litigation analytics",
+        "precedent": "legal precedent analysis",
+        "case law": "legal precedent analysis",
+        "compliance": "regulatory compliance systems",
+        "regulation": "regulatory intelligence",
+        "regulatory": "regulatory intelligence",
+        "policy": "policy intelligence",
+        "statute": "statutory analysis",
+        "attorney": "legal workflow systems",
+        "lawyer": "legal workflow systems",
+        "legal document": "legal document analysis"
     }
     
     fields_to_analyze = [
@@ -669,11 +687,20 @@ def generate_master_reasoning_prompt(student_matrix: str, historical_pool: str, 
         "Interest areas are merely supporting secondary signals. Past technical history is the primary driver.\n"
         "Core Generation Formula: Shared Interest + History Asset + Real World Problem = Opportunity.\n\n"
         
-        "MANDATORY REQUIREMENT - OPPORTUNITY DIVERSITY ENGINE:\n"
-        "You MUST return exactly 3 opportunities inside the output JSON array, and each must fulfill a completely distinct bucket requirement:\n"
-        "1. Idea 1 = Highest Trajectory Fit (Direct continuation of past history assets and technical lineage)\n"
-        "2. Idea 2 = Strongest Interdisciplinary Opportunity (Innovative intersection combining past technical history assets with a completely separate/unexpected interest area or domain, e.g. Finance + Game Modding, Finance + Robotics, or Healthcare + Cybersecurity)\n"
-        "3. Idea 3 = Highest Novelty Opportunity (Deep research-backed problem space that pushes the student out of basic high school clichés into unique domain anomalies)\n\n"
+        "MANDATORY REQUIREMENT - COHERENT TRAJECTORY ENGINE:\n"
+        "Generate exactly 3 project opportunities.\n\n"
+        "All 3 opportunities MUST remain within the student's primary interest cluster and demonstrated trajectory.\n"
+        "Do NOT switch industries unless the student's history explicitly supports multiple industries.\n\n"
+        "For example:\n"
+        "- AI + Law students should receive opportunities in legal technology, judicial systems, policy analysis, compliance systems, legal NLP, contract intelligence, litigation analytics, or regulatory technology.\n"
+        "- AI + Finance students should receive opportunities in financial markets, risk analysis, trading systems, economic forecasting, fraud detection, fintech infrastructure, or quantitative research.\n"
+        "- AI + Healthcare students should receive opportunities in diagnostics, patient care, medical imaging, clinical analytics, healthcare operations, or biomedical research.\n\n"
+        "The 3 opportunities should represent:\n"
+        "1. Direct Trajectory Extension (most natural next step from prior work)\n"
+        "2. Adjacent Opportunity Expansion (same domain but broader impact)\n"
+        "3. Advanced Research Direction (most ambitious and technically sophisticated direction)\n\n"
+        "These are variations in depth and sophistication, NOT variations in industry.\n\n"
+        "All three ideas must feel like a coherent intellectual progression that could realistically appear in the same student's portfolio.\n\n"
         "All 3 ideas MUST be completely different: different problem spaces, different user groups, different deployment directions, and different industries wherever possible. Never provide three variations of the same domain (e.g., three finance stock models).\n\n"
         
         "TRAJECTORY ANALYSIS & SIGNAL WEIGHTING RULES:\n"
@@ -778,7 +805,25 @@ def generate_ideas_external(profile: StudentProfile):
         student_info["history_assets"] = extract_student_history_assets(student_info)
         student_info["archetype"] = infer_student_archetype(student_info)
         
-        search_query = f"Themes: {profile.interest_areas} Targets: {student_info['existing_project_idea']} Assets: {', '.join(student_info['history_assets'])}"
+        search_query = f"""
+            Interest Areas:
+            {profile.interest_areas}
+
+            Toughest Project:
+            {student_info['toughest_project']}
+
+            Future Goal:
+            {student_info['future_goal']}
+
+            Existing Project Idea:
+            {student_info['existing_project_idea']}
+
+            Club Information:
+            {student_info['club_information']}
+
+            History Assets:
+            {', '.join(student_info['history_assets'])}
+            """
         
         initial_pool = execute_hybrid_retrieval(search_query, student_info, top_k=2)
         formatted_pool_text = "\n".join([
@@ -789,7 +834,48 @@ def generate_ideas_external(profile: StudentProfile):
         sys_prompt = generate_master_reasoning_prompt(
             student_matrix=json.dumps(student_info, indent=2),
             historical_pool=formatted_pool_text,
-            group_rules="Individual Student Mode: Generate exactly 1 trajectory-fit, 1 interdisciplinary, and 1 novelty option based on history_assets."
+            group_rules="""
+                Individual Student Mode:
+
+                Generate exactly 3 project opportunities.
+
+                All 3 opportunities MUST remain inside the student's
+                primary interest cluster and demonstrated trajectory.
+
+                Do NOT switch industries unless the student's
+                history explicitly supports multiple industries.
+
+                The 3 opportunities should represent:
+
+                1. Direct Trajectory Extension
+                - The most natural next project based on the student's strongest demonstrated work.
+
+                2. Adjacent Opportunity Expansion
+                - A neighboring problem space that still belongs to the same interest domain.
+
+                3. Advanced Research Direction
+                - A more ambitious research-grade problem within the same domain.
+
+                Examples:
+
+                Student interested in AI + Law:
+                All ideas should remain within legal systems, contracts, compliance,
+                judicial reasoning, legal NLP, regulation, policy, litigation,
+                or legal intelligence.
+
+                Student interested in AI + Finance:
+                All ideas should remain within finance, markets, trading,
+                risk, portfolio analysis, fraud detection, fintech,
+                or quantitative systems.
+
+                Student interested in AI + Healthcare:
+                All ideas should remain within healthcare, diagnostics,
+                medical imaging, public health, genomics,
+                or clinical decision systems.
+
+                Never generate random interdisciplinary projects
+                unless explicitly supported by the student's history.
+                """
         )
         
         response = groq_client.chat.completions.create(
@@ -1127,6 +1213,6 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=int(os.environ.get("PORT", 8000))
     )
