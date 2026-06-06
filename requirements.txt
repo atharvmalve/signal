@@ -7,3 +7,8 @@ scikit-learn
 groq
 httpx
 python-dotenv
+torch
+torchvision
+torchaudio
+transformers
+sentence-transformers

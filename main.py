@@ -4,7 +4,6 @@ Implements problem-first discovery loops, hybrid semantic-archetype matching mat
 student archetype engines, and multi-student group compatibility mapping layers.
 Preserves FastAPI routing signatures, Tally ingestion layers, and strict API contracts.
 Refactored to enforce Trajectory-Based Opportunity Discovery over generic interest matching.
-Optimized for lightweight environments (Scikit-Learn TF-IDF取代SentenceTransformers).
 """
 
 import os
@@ -23,8 +22,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import SentenceTransformer
 from groq import Groq
 
 load_dotenv()
@@ -51,12 +49,12 @@ app.add_middleware(
 )
 
 # ---------------------------------------------------------------------------
-# GLOBAL STATE & TF-IDF SEMANTIC CORES
+# GLOBAL STATE & DENSE EMBEDDING CORES
 # ---------------------------------------------------------------------------
 SESSIONS: Dict[str, Dict[str, Any]] = {}
-TFIDF_VECTORIZER: Optional[TfidfVectorizer] = None
+EMBEDDING_MODEL: Optional[SentenceTransformer] = None
 PROJECTS_DF: Optional[pd.DataFrame] = None
-PROJECT_TFIDF_MATRIX: Any = None
+PROJECT_EMBEDDINGS: Optional[np.ndarray] = None
 PROJECT_TAGS_MAP: Dict[int, set] = {}  # Maps dataframe row index to extracted keyword tags
 
 CSV_FILE_PATH = "student_projects.csv"
@@ -185,7 +183,7 @@ def extract_domain_tags(text_corpus: str) -> set:
     return tags
 
 # ---------------------------------------------------------------------------
-# STUDENT HISTORY ASSETS EXTRACTION SERVICE
+# STUDENT HISTORY ASSETS EXTRACTION SERVICE (FAILURE 3 FIX)
 # ---------------------------------------------------------------------------
 def extract_student_history_assets(profile: Dict[str, Any]) -> List[str]:
     """
@@ -432,14 +430,9 @@ async def cache_refresh_scheduler():
 # ---------------------------------------------------------------------------
 @app.on_event("startup")
 async def startup_pipeline_sequence():
-    global TFIDF_VECTORIZER, PROJECTS_DF, PROJECT_TFIDF_MATRIX, PROJECT_TAGS_MAP
-    logger.info("Initializing Lightweight TF-IDF Semantic Retrieval Layer...")
-    TFIDF_VECTORIZER = TfidfVectorizer(
-        lowercase=True,
-        stop_words="english",
-        ngram_range=(1, 2),
-        max_features=5000
-    )
+    global EMBEDDING_MODEL, PROJECTS_DF, PROJECT_EMBEDDINGS, PROJECT_TAGS_MAP
+    logger.info("Initializing Dense Vector Architecture Layer (all-MiniLM-L6-v2)...")
+    EMBEDDING_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
 
     if not os.path.exists(CSV_FILE_PATH):
         mock_data = {
@@ -468,49 +461,38 @@ async def startup_pipeline_sequence():
     enriched_docs = []
     PROJECT_TAGS_MAP.clear()
     
-    # Pre-extract tags for metadata structure expansion
     for idx, row in PROJECTS_DF.iterrows():
         title = row.get("Title", "")
         desc = row.get("Description", "")
         cat = row.get("Project Category", "")
         category = row.get("Category", "")
+        
+        dense_doc = (
+            f"TITLE: {title} | DOMAIN: {cat} | SECTOR: {category}\n"
+            f"CORE BLUEPRINT DESCRIPTION: {desc}\n"
+        )
+        enriched_docs.append(dense_doc)
+        PROJECTS_DF.at[idx, "search_doc"] = dense_doc
+        
         combined_metadata_text = f"{title} {desc} {cat} {category}"
         PROJECT_TAGS_MAP[idx] = extract_domain_tags(combined_metadata_text)
 
-    for idx, row in PROJECTS_DF.iterrows():
-        title = row.get("Title", "")
-        desc = row.get("Description", "")
-        cat = row.get("Project Category", "")
-        category = row.get("Category", "")
-        tags_list = ", ".join(list(PROJECT_TAGS_MAP[idx])) if PROJECT_TAGS_MAP[idx] else "none"
-        
-        # Extended corpus layout compensating for the structural loss of transformer architecture
-        enriched_doc = (
-            f"TITLE: {title}\n"
-            f"DOMAIN: {category}\n"
-            f"SECTOR: {cat}\n"
-            f"KEYWORDS: {tags_list}\n"
-            f"DESCRIPTION: {desc}\n"
-        )
-        enriched_docs.append(enriched_doc)
-        PROJECTS_DF.at[idx, "search_doc"] = enriched_doc
-
-    logger.info("Generating corpus TF-IDF matrix space...")
-    PROJECT_TFIDF_MATRIX = TFIDF_VECTORIZER.fit_transform(enriched_docs)
+    logger.info("Generating corpus vector matrix space...")
+    PROJECT_EMBEDDINGS = EMBEDDING_MODEL.encode(enriched_docs, convert_to_numpy=True)
     
     await TALLY_SERVICE.fetch_all_submissions()
     asyncio.create_task(cache_refresh_scheduler())
 
 # ---------------------------------------------------------------------------
-# REFACTORED HYBRID RETRIEVAL MATCH ENGINE
+# REFACTORED HYBRID RETRIEVAL MATCH ENGINE (SIMILAR PROJECT MATCHING FIX)
 # ---------------------------------------------------------------------------
 def execute_hybrid_retrieval(query_context: str, student_info: Dict[str, Any], top_k: int = 2) -> List[Dict[str, Any]]:
     """
     Implements optimized retrieval utilizing corrected algorithmic weights:
-    Score = 0.45 Category Match + 0.35 Keyword Asset Overlap + 0.20 Semantic TF-IDF Similarity
+    Score = 0.45 Category Match + 0.35 Keyword Asset Overlap + 0.20 Semantic Embedding
     Restricts outputs strictly to 1-2 projects of authentic quality.
     """
-    if PROJECTS_DF is None or PROJECTS_DF.empty or TFIDF_VECTORIZER is None or PROJECT_TFIDF_MATRIX is None:
+    if PROJECTS_DF is None or PROJECTS_DF.empty or EMBEDDING_MODEL is None or PROJECT_EMBEDDINGS is None:
         return []
     
     target_themes = [t.lower().strip() for t in student_info.get("project_themes", [])]
@@ -520,9 +502,10 @@ def execute_hybrid_retrieval(query_context: str, student_info: Dict[str, Any], t
     opportunity_tags = extract_domain_tags(query_context)
     history_assets = [str(a).lower() for a in student_info.get("history_assets", student_info.get("group_history_assets", []))]
     
-    # TF-IDF Cosine Match Architecture Pipeline
-    query_vec = TFIDF_VECTORIZER.transform([query_context])
-    semantic_sims = cosine_similarity(query_vec, PROJECT_TFIDF_MATRIX).flatten()
+    query_vec = EMBEDDING_MODEL.encode([query_context], convert_to_numpy=True)
+    scores = np.dot(PROJECT_EMBEDDINGS, query_vec.T).flatten()
+    norms = np.linalg.norm(PROJECT_EMBEDDINGS, axis=1) * np.linalg.norm(query_vec)
+    semantic_sims = np.divide(scores, norms, out=np.zeros_like(scores), where=norms != 0)
     
     candidate_matches = []
     
@@ -764,7 +747,7 @@ def health_check():
 
 @app.post("/generate", response_model=GenerateIdeasResponse)
 def generate_ideas_external(profile: StudentProfile):
-    if not groq_client or not TFIDF_VECTORIZER:
+    if not groq_client or not EMBEDDING_MODEL:
         raise HTTPException(status_code=503, detail="Required AI Compute Engine or Core Embedder configurations missing.")
         
     try:
@@ -896,7 +879,7 @@ def generate_ideas_bettermind(request: BettermindGenerateRequest):
         raise HTTPException(status_code=400, detail="Invalid application execution mode parameter.")
     if len(request.participants) + 1 > 3:
         raise HTTPException(status_code=400, detail="Group matrix configuration limits exceeded (Max 3 members).")
-    if not groq_client or not TFIDF_VECTORIZER:
+    if not groq_client or not EMBEDDING_MODEL:
         raise HTTPException(status_code=503, detail="Required Core Model configurations unassigned.")
 
     try:
