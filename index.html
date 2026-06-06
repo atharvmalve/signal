@@ -940,7 +940,7 @@
             </div>
         </div>
         <div class="api-config">
-            <input type="text" id="backendUrl" class="api-input" value="https://signal-2khw.onrender.com" placeholder="Backend Environment URL">
+            <input type="text" id="backendUrl" class="api-input" value="https://atharv1221-signals.hf.space" placeholder="Backend Environment URL">
         </div>
     </header>
 
@@ -1173,7 +1173,7 @@
                     }
                 });
 
-                url = `${backendBase}generate-bml`;
+                url = `${backendBase}/generate-bml`;
                 payload = {
                     mode: "bettermind",
                     primary_student: { email: primary },
@@ -1193,7 +1193,7 @@
                     return;
                 }
 
-                url = `${backendBase}generate`;
+                url = `${backendBase}/generate`;
                 payload = {
                     email: email,
                     interest_areas: interests,
@@ -1422,7 +1422,7 @@
 
         async function triggerNicheDown(ideaId) {
             const backendBase = document.getElementById('backendUrl').value.trim();
-            const url = `${backendBase}niche-down`;
+            const url = `${backendBase}/niche-down`;
             const payload = {
                 session_id: appState.currentSessionId,
                 idea_id: ideaId
