@@ -1,17 +1,9 @@
-# Web Framework & Server
 fastapi
 uvicorn
-
-# Data Validation & Parsing
-pydantic
-email-validator  # Required for Pydantic's EmailStr validation
-
-# AI, Machine Learning & Embeddings
-sentence-transformers
-groq
-numpy
+pydantic[email]
 pandas
-
-# Utilities & HTTP Client
-python-dotenv
+numpy
+scikit-learn
+groq
 httpx
+python-dotenv
