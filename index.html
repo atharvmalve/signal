@@ -132,8 +132,8 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: 64px 48px;
+            justify-content: flex-start; /* Fixed: Prevents top-clipping on smaller laptop screens */
+            padding: 80px 48px; /* Balanced scrolling padding */
             overflow-y: auto;
             border-left: 1px solid var(--border-color);
         }
@@ -693,10 +693,10 @@
             margin-top: 64px;
         }
 
-        /* --- MOBILE RESPONSIVENESS --- */
+        /* --- RESPONSIVENESS AND CORRECTIONS --- */
         @media (min-width: 1025px) {
             .form-panel {
-                padding: 52px 40px;
+                padding: 64px 40px; /* Optimized laptop view safe bounds */
             }
             .headline {
                 margin-bottom: 10px;
@@ -811,9 +811,19 @@
         @media (max-width: 1024px) {
             #home-screen {
                 grid-template-columns: 1fr;
-                grid-template-rows: 35vh 65vh;
+                grid-template-rows: auto; /* Fixed: Removed fixed heights to prevent component overlaps */
                 height: auto;
                 overflow-y: auto;
+            }
+            .video-panel {
+                display: none; /* Fixed: Completely removed background video element on mobile views */
+            }
+            .brand-logo {
+                position: relative; /* Fixed: Positioned cleanly into screen layout context */
+                top: 0;
+                left: 0;
+                padding: 32px 24px 0 24px;
+                color: var(--text-main) !important; /* Fixed: Forces visibility dark scheme color on mobile's bright body background */
             }
             .app-screen {
                 position: relative;
@@ -823,11 +833,9 @@
             }
             .form-panel {
                 border-left: none;
-                padding: 48px 24px;
-            }
-            .brand-logo {
-                top: 24px;
-                left: 24px;
+                padding: 32px 24px 64px 24px; /* Balanced layout system boundaries */
+                justify-content: flex-start;
+                height: auto;
             }
             #results-screen {
                 padding: 100px 24px 48px 24px;
@@ -922,25 +930,25 @@
                             <div class="input-group">
                                 <label class="input-label">Interest Areas (Select all that apply)</label>
                                 <div class="tags-wrapper" id="interest-tags-container">
-    <div class="tag-item" onclick="toggleTag(this)">AI + Finance</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Cybersecurity</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Healthcare</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Business</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Law</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Neuroscience</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Environment</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Space Exploration</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Transportation</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Sports</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Education</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Social Good</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Humanities</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Language</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Quant</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Psychology</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Entrepreneurship</div>
-    <div class="tag-item" onclick="toggleTag(this)">AI + Robotics</div>
-</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Finance</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Cybersecurity</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Healthcare</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Business</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Law</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Neuroscience</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Environment</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Space Exploration</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Transportation</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Sports</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Education</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Social Good</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Humanities</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Language</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Quant</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Psychology</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Entrepreneurship</div>
+                                    <div class="tag-item" onclick="toggleTag(this)">AI + Robotics</div>
+                                </div>
                             </div>
                             <div class="input-group">
                                 <label class="input-label">Intended Major</label>
@@ -1042,7 +1050,7 @@
                 </div>
                 
                 <div class="cards-grid" id="projects-cards-container">
-                    </div>
+                </div>
 
                 <div class="results-actions-bottom">
                     <button class="btn btn-restart" onclick="resetToHome()">Generate Again</button>
@@ -1050,13 +1058,12 @@
             </div>
 
             <div id="expanded-view-state" class="expanded-view-container">
-                </div>
+            </div>
 
         </div>
     </div>
 
     <script>
-        
         // Track state models globally
         let currentActiveTab = 'external';
         let currentWizardStep = 1;
@@ -1141,7 +1148,8 @@
             });
             return selected.join(', ');
         }
-// Core function to handle external student signals submission
+
+        // Core function to handle external student signals submission
         async function submitExternalSignals() {
             const payload = {
                 email: document.getElementById('ext-email').value || "external@gmail.com",
@@ -1204,25 +1212,14 @@
 
         // Structural Normalization Engine to defend structural fields against API variance
         function extractProjectsList(raw) {
-    if (!raw) return [];
-
-    if (Array.isArray(raw))
-        return raw;
-
-    if (Array.isArray(raw.ideas))
-        return raw.ideas;
-
-    if (Array.isArray(raw.projects))
-        return raw.projects;
-
-    if (Array.isArray(raw.data))
-        return raw.data;
-
-    if (Array.isArray(raw.signals))
-        return raw.signals;
-
-    return [];
-}
+            if (!raw) return [];
+            if (Array.isArray(raw)) return raw;
+            if (Array.isArray(raw.ideas)) return raw.ideas;
+            if (Array.isArray(raw.projects)) return raw.projects;
+            if (Array.isArray(raw.data)) return raw.data;
+            if (Array.isArray(raw.signals)) return raw.signals;
+            return [];
+        }
 
         function safeGet(obj, keys, defaultVal = "N/A") {
             for (let key of keys) {
@@ -1239,10 +1236,10 @@
             // If empty array, build production standard mocks to satisfy the deterministic view structural laws
             if (!rawProjects || rawProjects.length < 3) {
                 if (!rawProjects || rawProjects.length === 0) {
-    alert("No projects returned from backend");
-    console.error(data);
-    return;
-}
+                    alert("No projects returned from backend");
+                    console.error(data);
+                    return;
+                }
             }
 
             // Lock to exactly 3 standard cards
@@ -1258,10 +1255,10 @@
                 const difficulty = safeGet(project, ['Difficulty', 'difficulty', 'project_difficulty']);
                 const feasibility = safeGet(project, ['Feasibility Score', 'feasibility_score', 'feasibility']);
                 if (Array.isArray(whyFits)) {
-    whyFits = whyFits.join(' • ');
-}
+                    whyFits = whyFits.join(' • ');
+                }
 
-whyFits = String(whyFits);
+                whyFits = String(whyFits);
                 const cardHtml = `
                     <div class="project-card" id="card-${idx}">
                         <div class="card-meta-top">
@@ -1329,7 +1326,6 @@ whyFits = String(whyFits);
         function buildExpandedView(p) {
             const container = document.getElementById('expanded-view-state');
             
-
             // Collect robust normalized parameter variables matching exact layout mandates
             const title = safeGet(p, ['Title', 'title', 'project_title']);
             const problemArea = safeGet(p, ['Problem Area', 'problem_area']);
@@ -1419,30 +1415,24 @@ whyFits = String(whyFits);
                         <div class="detail-block"><div class="detail-label">College Narrative</div><div class="detail-content">${collegeNarrative}</div></div>
                     </div>
                 </div>
-${validSimilarProjects.length > 0 ? `
+                ${validSimilarProjects.length > 0 ? `
                 <div class="similar-projects-section">
                     <h3 class="similar-headline">Similar BetterMind Labs Portfolios</h3>
                     <div class="similar-grid">${similarHtml}</div>
                 </div>
-` : ''}
+                ` : ''}
                 <div class="expanded-actions-bottom">
                     <button class="btn btn-secondary btn-restart" onclick="collapseProjectExpandedView()">Back to All Projects</button>
                 </div>
             `;
         }
+
         function getYoutubeId(url) {
-    if (!url) return null;
-
-    const regExp =
-      /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#&?]*).*/;
-
-    const match = url.match(regExp);
-
-    return match && match[1].length === 11
-      ? match[1]
-      : null;
-}
-
+            if (!url) return null;
+            const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return match && match[1].length === 11 ? match[1] : null;
+        }
 
         function collapseProjectExpandedView() {
             gsap.to('#expanded-view-state', { opacity: 0, y: 30, duration: 0.3, onComplete: () => {
