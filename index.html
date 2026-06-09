@@ -819,10 +819,10 @@
                                 <label class="input-label">Future Career Goal</label>
                                 <input type="text" id="ext-goal" class="form-input" placeholder="e.g. AI Research Scientist">
                             </div>
-                            <!-- <div class="input-group">
+                            <div class="input-group">
                                 <label class="input-label">Program Goals</label>
                                 <input type="text" id="ext-program-goals" class="form-input" placeholder="e.g. Complete a high-tier research publication">
-                            </div> -->
+                            </div>
                             <div class="form-actions">
                                 <button type="button" class="btn btn-secondary" onclick="navigateWizard(-1)">Back</button>
                                 <button type="button" class="btn" onclick="navigateWizard(1)">Next Step</button>
@@ -1021,7 +1021,7 @@
                 programming_languages: document.getElementById('ext-languages').value.split(',').map(s => s.trim()).filter(Boolean),
                 clubs_and_activities: document.getElementById('ext-clubs').value || "General Clubs",
                 toughest_project: document.getElementById('ext-toughest').value || "Standard Class Labs",
-                program_goals: "null",
+                program_goals: document.getElementById('ext-program-goals').value || "Project Development",
                 proposed_idea: document.getElementById('ext-idea').value || "Exploratory Project AI",
                 preferred_college: document.getElementById('ext-college').value || "Top Tier University",
                 session_id: "signals"
