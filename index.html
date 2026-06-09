@@ -47,7 +47,6 @@
         }
 
         .logo-box {
-            border: 1px solid currentColor;
             padding: 8px 14px;
             display: flex;
             flex-direction: column;
@@ -207,6 +206,13 @@
 
         .wizard-flow.active, .bml-flow.active {
             display: block;
+        }
+
+        .wizard-step-indicator {
+            font-family: var(--font-main);
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
         }
 
         .wizard-progress {
@@ -374,6 +380,12 @@
             flex-direction: column;
             text-align: center;
             padding: 32px;
+        }
+
+        .loading-logo {
+            position: static;
+            color: var(--text-main);
+            margin-bottom: 28px;
         }
 
         .loading-title {
@@ -682,6 +694,120 @@
         }
 
         /* --- MOBILE RESPONSIVENESS --- */
+        @media (min-width: 1025px) {
+            .form-panel {
+                padding: 52px 40px;
+            }
+            .headline {
+                margin-bottom: 10px;
+            }
+            .subheadline {
+                margin-bottom: 32px;
+            }
+            .tab-navigation {
+                margin-bottom: 26px;
+                gap: 20px;
+            }
+            .tab-btn {
+                padding-bottom: 10px;
+            }
+            .wizard-progress {
+                margin-bottom: 26px;
+            }
+            .input-group {
+                margin-bottom: 19px;
+            }
+            .input-label {
+                margin-bottom: 6px;
+            }
+            .form-input {
+                padding: 10px 14px;
+            }
+            .tags-wrapper {
+                gap: 6px;
+                margin-top: 6px;
+            }
+            .tag-item {
+                padding: 6px 12px;
+            }
+            .form-actions {
+                margin-top: 26px;
+            }
+            #results-screen {
+                padding: 96px 48px 52px 48px;
+            }
+            .results-header {
+                margin-bottom: 32px;
+            }
+            .cards-grid {
+                gap: 20px;
+            }
+            .project-card {
+                padding: 30px;
+                min-height: 420px;
+            }
+            .card-meta-top {
+                margin-bottom: 20px;
+            }
+            .card-title {
+                margin-bottom: 13px;
+            }
+            .card-label {
+                margin-top: 13px;
+            }
+            .card-footer {
+                padding-top: 26px;
+            }
+            .results-actions-bottom {
+                margin-top: 38px;
+            }
+            .expanded-view-container {
+                padding: 52px;
+            }
+            .expanded-header {
+                padding-bottom: 32px;
+                margin-bottom: 32px;
+            }
+            .meta-specs-grid {
+                gap: 20px;
+                margin-top: 20px;
+            }
+            .detail-sections-grid {
+                gap: 52px;
+            }
+            .detail-block {
+                margin-bottom: 30px;
+            }
+            .similar-projects-section {
+                margin-top: 52px;
+                padding-top: 40px;
+            }
+            .similar-headline {
+                margin-bottom: 20px;
+            }
+            .similar-grid {
+                gap: 26px;
+            }
+            .similar-card {
+                padding: 20px;
+            }
+            .expanded-actions-bottom {
+                margin-top: 52px;
+            }
+        }
+
+        @media (min-width: 1600px) {
+            .form-container-inner {
+                max-width: 500px;
+            }
+            .results-wrapper {
+                max-width: 1480px;
+            }
+            .expanded-view-container {
+                max-width: 1180px;
+            }
+        }
+
         @media (max-width: 1024px) {
             #home-screen {
                 grid-template-columns: 1fr;
@@ -760,11 +886,16 @@
                 <div class="form-flow-container">
                     
                     <div id="flow-external" class="wizard-flow active">
+                        <div class="wizard-step-indicator" id="wizard-step-indicator">Step 1 of 4</div>
                         <div class="wizard-progress">
                             <div class="wizard-progress-bar" id="wizard-progress-bar"></div>
                         </div>
 
                         <div class="wizard-step active" data-step="1">
+                            <div class="input-group">
+                                <label class="input-label">Email Address</label>
+                                <input type="email" id="ext-email" class="form-input" placeholder="you@example.com">
+                            </div>
                             <div class="input-group">
                                 <label class="input-label">Grade Level</label>
                                 <select id="ext-grade" class="form-input">
@@ -818,10 +949,6 @@
                             <div class="input-group">
                                 <label class="input-label">Future Career Goal</label>
                                 <input type="text" id="ext-goal" class="form-input" placeholder="e.g. AI Research Scientist">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Program Goals</label>
-                                <input type="text" id="ext-program-goals" class="form-input" placeholder="e.g. Complete a high-tier research publication">
                             </div>
                             <div class="form-actions">
                                 <button type="button" class="btn btn-secondary" onclick="navigateWizard(-1)">Back</button>
@@ -890,6 +1017,12 @@
     </div>
 
     <div id="loading-screen" class="app-screen">
+        <div class="loading-logo">
+            <div class="logo-box">
+                <span class="logo-main">Signals</span>
+                <span class="logo-sub">by BetterMind Labs</span>
+            </div>
+        </div>
         <h2 class="loading-title">Analyzing Student Trajectory</h2>
         <div class="loading-status-container">
             <div class="loading-status">Identifying strengths</div>
@@ -912,7 +1045,7 @@
                     </div>
 
                 <div class="results-actions-bottom">
-                    <button class="btn btn-secondary btn-restart" onclick="resetToHome()">Generate Again</button>
+                    <button class="btn btn-restart" onclick="resetToHome()">Generate Again</button>
                 </div>
             </div>
 
@@ -965,6 +1098,7 @@
                     // Track structural step indicators
                     const percentage = (currentWizardStep / 4) * 100;
                     document.getElementById('wizard-progress-bar').style.width = `${percentage}%`;
+                    document.getElementById('wizard-step-indicator').textContent = `Step ${currentWizardStep} of 4`;
 
                     gsap.fromTo(targetStepEl, { opacity: 0, x: direction > 0 ? 20 : -20 }, { opacity: 1, x: 0, duration: 0.35 });
                 }});
@@ -1010,7 +1144,7 @@
 // Core function to handle external student signals submission
         async function submitExternalSignals() {
             const payload = {
-                email: "external@gmail.com",
+                email: document.getElementById('ext-email').value || "external@gmail.com",
                 grade: parseInt(document.getElementById('ext-grade').value) || 9,
                 city: document.getElementById('ext-city').value || "Not Specified",
                 interest_areas: getSelectedInterests() || "AI & General Technology",
@@ -1021,7 +1155,7 @@
                 programming_languages: document.getElementById('ext-languages').value.split(',').map(s => s.trim()).filter(Boolean),
                 clubs_and_activities: document.getElementById('ext-clubs').value || "General Clubs",
                 toughest_project: document.getElementById('ext-toughest').value || "Standard Class Labs",
-                program_goals: document.getElementById('ext-program-goals').value || "Project Development",
+                program_goals:"",
                 proposed_idea: document.getElementById('ext-idea').value || "Exploratory Project AI",
                 preferred_college: document.getElementById('ext-college').value || "Top Tier University",
                 session_id: "signals"
@@ -1211,7 +1345,7 @@ whyFits = String(whyFits);
             const difficulty = safeGet(p, ['Difficulty', 'difficulty']);
             const feasibilityScore = safeGet(p, ['Feasibility Score', 'feasibility_score']);
             const feasibilityReasoning = safeGet(p, ['Feasibility Reasoning', 'feasibility_reasoning']);
-            const collegeValue = safeGet(p, ['College Application Value', 'college_application_value', 'college_value']);
+            const collegeValue = safeGet(p, ['College Application Value','college_application_value', 'college_value']);
             const problemContext = safeGet(p, ['Problem Context', 'problem_context']);
             const whoExperiences = safeGet(p, ['Who Experiences This Problem', 'who_experiences_this_problem']);
             const whyExists = safeGet(p, ['Why This Problem Exists', 'why_this_problem_exists']);
@@ -1221,44 +1355,16 @@ whyFits = String(whyFits);
             // Parse Similar Projects Node Arrays safely
             let similarHtml = '';
             let rawSimilar = p.similar_projects || p.Similar_Projects || [];
-            if (!Array.isArray(rawSimilar) || rawSimilar.length === 0) {
-                // Ensure structural integrity with fallback up to 2 items
-                rawSimilar = [
-                    { title: "Bio-Synthesized Multi-Omics Tracker", student: "Aris V.", desc: "Engineered a transformation framework parsing sequencing configurations via standard transformers.", youtube_id: "dQw4w9WgXcQ" },
-                    { title: "Stochastic Orderbook Optimization Modeling", student: "Siddharth N.", desc: "Applied graph architectures onto localized latency matrices to model market execution parameters.", youtube_id: "dQw4w9WgXcQ" }
-                ];
-            }
+            const validSimilarProjects = Array.isArray(rawSimilar)
+                ? rawSimilar.filter(x => getYoutubeId(x.youtube_url))
+                : [];
 
-            rawSimilar.slice(0, 2).forEach(sim => {
+            validSimilarProjects.slice(0, 2).forEach(sim => {
                 const sTitle = safeGet(sim, ['title', 'Project Title', 'Project title']);
                 const sStudent = safeGet(sim, ['student_name', 'student', 'Student Name', 'Student name', 'name'], "BetterMind Scholar");
                 const sDesc = safeGet(sim, ['desc', 'Description', 'description']);
-                const sVid = safeGet(sim, ['youtube_id', 'youtube_video_id', 'video_id'], "dQw4w9WgXcQ");
                 const youtubeId = getYoutubeId(sim.youtube_url);
-                let mediaSection = '';
 
-if (youtubeId) {
-    mediaSection = `
-        <div class="video-container-embed">
-            <iframe
-                src="https://www.youtube.com/embed/${youtubeId}"
-                loading="lazy"
-                allowfullscreen>
-            </iframe>
-        </div>
-    `;
-} else {
-    mediaSection = `
-        <div class="portfolio-preview">
-            <div class="portfolio-placeholder">
-                <div class="portfolio-icon">✦</div>
-                <div class="portfolio-text">
-                    BetterMind Labs Portfolio
-                </div>
-            </div>
-        </div>
-    `;
-}
                 similarHtml += `
                     <div class="similar-card">
                         <div class="similar-header-row">
@@ -1269,7 +1375,13 @@ if (youtubeId) {
                             <span class="bml-tag">BetterMind Labs Student</span>
                         </div>
                         <p class="similar-desc">${sDesc}</p>
-                        ${mediaSection}
+                        <div class="video-container-embed">
+                            <iframe
+                                src="https://www.youtube.com/embed/${youtubeId}"
+                                loading="lazy"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
                     </div>
                 `;
             });
@@ -1307,12 +1419,12 @@ if (youtubeId) {
                         <div class="detail-block"><div class="detail-label">College Narrative</div><div class="detail-content">${collegeNarrative}</div></div>
                     </div>
                 </div>
-
+${validSimilarProjects.length > 0 ? `
                 <div class="similar-projects-section">
                     <h3 class="similar-headline">Similar BetterMind Labs Portfolios</h3>
                     <div class="similar-grid">${similarHtml}</div>
                 </div>
-
+` : ''}
                 <div class="expanded-actions-bottom">
                     <button class="btn btn-secondary btn-restart" onclick="collapseProjectExpandedView()">Back to All Projects</button>
                 </div>
@@ -1358,6 +1470,7 @@ if (youtubeId) {
                 // Reset internal state matrices
                 currentWizardStep = 1;
                 document.getElementById('wizard-progress-bar').style.width = '25%';
+                document.getElementById('wizard-step-indicator').textContent = 'Step 1 of 4';
                 document.querySelectorAll('.wizard-step').forEach((s, idx) => {
                     s.classList.toggle('active', idx === 0);
                     gsap.set(s, { opacity: 1, x: 0 });
@@ -1394,11 +1507,7 @@ if (youtubeId) {
                         "Who Experiences This Problem": "Enterprise cloud ecosystems and predictive research laboratories worldwide.",
                         "Why This Problem Exists": "Legacy infrastructure fails to separate static features from changing real-time inputs efficiently.",
                         "Potential Project Direction": "Publishing an elegant package framework to solve validation challenges.",
-                        "College Narrative": "A builder who bridges abstract mathematics with highly practical system level tools.",
-                        "similar_projects": [
-                            { "title": "Predictive Graph Transformers", "student": "Alex M.", "desc": "Built customized tracking layers for spatio-temporal datasets.", "youtube_id": "dQw4w9WgXcQ" },
-                            { "title": "Distributed Optimization Engines", "student": "Elena R.", "desc": "Created low latency model parsers for resource-constrained systems.", "youtube_id": "dQw4w9WgXcQ" }
-                        ]
+                        "College Narrative": "A builder who bridges abstract mathematics with highly practical system level tools."
                     },
                     {
                         "Title": `Quantized Feature Synthesis inside ${major} Architectures`,
@@ -1420,11 +1529,7 @@ if (youtubeId) {
                         "Who Experiences This Problem": "Early stage startups and independent software engineering labs.",
                         "Why This Problem Exists": "Pruning architectures often strip essential contextual weights blindly.",
                         "Potential Project Direction": "Developing an open-source benchmarking suite for edge compute models.",
-                        "College Narrative": "An innovator dedicated to building fast, accessible, and resource-mindful systems.",
-                        "similar_projects": [
-                            { "title": "Localized Tensor Compression", "student": "Jihoo K.", "desc": "Achieved 4x space reduction on matrix models with zero loss.", "youtube_id": "dQw4w9WgXcQ" },
-                            { "title": "Edge Array Parsers", "student": "Sarah L.", "desc": "Optimized real-time embedding loops for mobile processors.", "youtube_id": "dQw4w9WgXcQ" }
-                        ]
+                        "College Narrative": "An innovator dedicated to building fast, accessible, and resource-mindful systems."
                     },
                     {
                         "Title": `Heuristic Neural Cross-Evaluation for ${interest}`,
@@ -1446,11 +1551,7 @@ if (youtubeId) {
                         "Who Experiences This Problem": "Every data scientist working across disparate unmapped data points.",
                         "Why This Problem Exists": "Traditional mapping functions are rigidly hardcoded and cannot handle fluid shifts.",
                         "Potential Project Direction": "Authoring a theoretical research paper exploring multi-modal alignment.",
-                        "College Narrative": "A systemic researcher capable of identifying hidden core patterns in chaotic environments.",
-                        "similar_projects": [
-                            { "title": "Contrastive Latent Integrators", "student": "Marcus V.", "desc": "Standardized unstructured multi-modal inputs with high consistency.", "youtube_id": "dQw4w9WgXcQ" },
-                            { "title": "Automated Schema Alignment", "student": "Chloe W.", "desc": "Implemented structural graph maps for messy legacy enterprise datasets.", "youtube_id": "dQw4w9WgXcQ" }
-                        ]
+                        "College Narrative": "A systemic researcher capable of identifying hidden core patterns in chaotic environments."
                     }
                 ]
             };
